@@ -1,5 +1,7 @@
 package org.nguyendevs.suddendeath.GUI;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
@@ -8,8 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.potion.PotionEffectType;
 import org.nguyendevs.suddendeath.SuddenDeath;
 import org.nguyendevs.suddendeath.Utils.ConfigFile;
 import org.nguyendevs.suddendeath.Utils.MobStat;
@@ -48,12 +48,12 @@ public class StatEditor implements Listener {
 
     public void close() {
         open = false;
-        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+        AsyncChatEvent.getHandlerList().unregister(this);
         InventoryOpenEvent.getHandlerList().unregister(this);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+    public void onAsyncChat(AsyncChatEvent event) {
         if (!open) {
             return;
         }
@@ -61,7 +61,7 @@ public class StatEditor implements Listener {
         event.setCancelled(true);
         try {
             player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-            String message = event.getMessage().trim();
+            String message = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
 
             if (message.equalsIgnoreCase(CANCEL_COMMAND)) {
                 handleCancel(player);
@@ -82,7 +82,7 @@ public class StatEditor implements Listener {
             }
         } catch (Exception e) {
             SuddenDeath.getInstance().getLogger().log(Level.WARNING,
-                    "Error handling AsyncPlayerChatEvent for player: " + player.getName(), e);
+                    "Error handling AsyncChatEvent for player: " + player.getName(), e);
             player.sendMessage(Utils.color(PREFIX + " &cAn error occurred while processing your input."));
         }
     }
@@ -98,7 +98,8 @@ public class StatEditor implements Listener {
         config.getConfig().set(path + "." + stat.getPath(), message.equalsIgnoreCase(NULL_VALUE) ? null : message);
         config.save();
         new MonsterEdition(player, type, path).open();
-        player.sendMessage(Utils.color(PREFIX + " &e" + stat.getName() + " &7successfully changed to &6" + message + "&7."));
+        player.sendMessage(
+                Utils.color(PREFIX + " &e" + stat.getName() + " &7successfully changed to &6" + message + "&7."));
     }
 
     private void handleDoubleInput(Player player, String message) {
@@ -136,10 +137,11 @@ public class StatEditor implements Listener {
         try {
             int amplifier = Integer.parseInt(split[1]);
             close();
-            config.getConfig().set(path + "." + stat.getPath() + "." + effect.getName(), amplifier);
+            String effectKey = effect.getKey().getKey();
+            config.getConfig().set(path + "." + stat.getPath() + "." + effectKey, amplifier);
             config.save();
             new MonsterEdition(player, type, path).open();
-            player.sendMessage(Utils.color(PREFIX + " &e" + effect.getName() + " " + amplifier + " &7successfully added."));
+            player.sendMessage(Utils.color(PREFIX + " &e" + effectKey + " " + amplifier + " &7successfully added."));
         } catch (NumberFormatException e) {
             player.sendMessage(Utils.color(PREFIX + " &c" + split[1] + " is not a valid number!"));
         }

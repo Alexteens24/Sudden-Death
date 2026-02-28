@@ -260,7 +260,7 @@ public class SuddenDeathStatusCommand implements CommandExecutor {
             plugin.reloadConfigFiles();
             for (Feature feature : Feature.values())
                 feature.updateConfig();
-            msg(sender, Utils.msg("prefix") + " " + "&e" + plugin.getName() + " " + plugin.getDescription().getVersion()
+            msg(sender, Utils.msg("prefix") + " " + "&e" + plugin.getName() + " " + plugin.getPluginMeta().getVersion()
                     + " reloaded.");
             if (sender instanceof Player p)
                 sound(p, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.5f);

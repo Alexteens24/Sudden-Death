@@ -12,7 +12,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,11 +31,13 @@ public class SpigotPlugin {
 	public void checkForUpdate() {
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			try {
-				HttpsURLConnection connection = (HttpsURLConnection) new URL(
+				HttpsURLConnection connection = (HttpsURLConnection) URI.create(
 						"https://api.spigotmc.org/legacy/update.php?resource=" + id)
-						.openConnection();
+						.toURL().openConnection();
 				connection.setRequestMethod("GET");
-				latestVersion = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+					latestVersion = reader.readLine();
+				}
 			} catch (IOException e) {
 				plugin.getLogger().log(Level.WARNING, "Couldn't check the latest plugin version: " + e.getMessage());
 				return;

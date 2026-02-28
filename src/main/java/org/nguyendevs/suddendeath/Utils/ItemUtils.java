@@ -119,7 +119,9 @@ public final class ItemUtils {
 					for (String ench : ENCHANTMENT_SPLITTER.split(enchants)) {
 						String[] split = LEVEL_SPLITTER.split(ench);
 						if (split.length == 2) {
-							Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(split[0]));
+							Enchantment enchantment = io.papermc.paper.registry.RegistryAccess.registryAccess()
+									.getRegistry(io.papermc.paper.registry.RegistryKey.ENCHANTMENT)
+									.get(NamespacedKey.minecraft(split[0]));
 							int level;
 							try {
 								level = Integer.parseInt(split[1]);

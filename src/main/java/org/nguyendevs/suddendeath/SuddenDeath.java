@@ -220,7 +220,7 @@ public class SuddenDeath extends JavaPlugin {
         s.sendMessage(color("&4   ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝"));
         s.sendMessage(color(""));
         s.sendMessage(color("&4         Sudden Death"));
-        s.sendMessage(color("&6         Version " + getDescription().getVersion()));
+        s.sendMessage(color("&6         Version " + getPluginMeta().getVersion()));
         s.sendMessage(color("&b         Development by NguyenDevs"));
         s.sendMessage(color(""));
     }

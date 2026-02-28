@@ -20,18 +20,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ZombieToolsFeature extends AbstractFeature {
 
     private enum ToolTier {
-        NETHERITE("NETHERITE", "netherite-chance"),
-        DIAMOND("DIAMOND", "diamond-chance"),
-        GOLDEN("GOLDEN", "gold-chance"),
-        IRON("IRON", "iron-chance"),
-        WOODEN("WOODEN", "wood-chance");
+        NETHERITE("NETHERITE"),
+        DIAMOND("DIAMOND"),
+        GOLDEN("GOLDEN"),
+        IRON("IRON"),
+        WOODEN("WOODEN");
 
         final String prefix;
-        final String configKey;
 
-        ToolTier(String prefix, String configKey) {
+        ToolTier(String prefix) {
             this.prefix = prefix;
-            this.configKey = configKey;
         }
     }
 
@@ -52,17 +50,23 @@ public class ZombieToolsFeature extends AbstractFeature {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onZombieSpawn(CreatureSpawnEvent event) {
-        if (!(event.getEntity() instanceof Zombie zombie)) return;
-        if (zombie.hasMetadata("SDCustomMob")) return;
-        if (!Feature.ZOMBIE_TOOLS.isEnabled(zombie)) return;
-        if (RANDOM.nextDouble() > Feature.ZOMBIE_TOOLS.getDouble("chance-percent") / 100.0) return;
+        if (!(event.getEntity() instanceof Zombie zombie))
+            return;
+        if (zombie.hasMetadata("SDCustomMob"))
+            return;
+        if (!Feature.ZOMBIE_TOOLS.isEnabled(zombie))
+            return;
+        if (RANDOM.nextDouble() > Feature.ZOMBIE_TOOLS.getDouble("chance-percent") / 100.0)
+            return;
 
         ToolTier tier = selectTier();
-        if (tier == null) return;
+        if (tier == null)
+            return;
 
         ToolType type = ToolType.values()[RANDOM.nextInt(ToolType.values().length)];
         Material mat = Material.getMaterial(tier.prefix + type.suffix);
-        if (mat == null) return;
+        if (mat == null)
+            return;
 
         ItemStack tool = new ItemStack(mat);
         if (RANDOM.nextDouble() <= Feature.ZOMBIE_TOOLS.getDouble("enchantment-chance") / 100.0) {
@@ -77,13 +81,17 @@ public class ZombieToolsFeature extends AbstractFeature {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onZombieDeath(EntityDeathEvent event) {
-        if (!(event.getEntity() instanceof Zombie zombie)) return;
-        if (!Feature.ZOMBIE_TOOLS.isEnabled(zombie)) return;
-        if (RANDOM.nextDouble() > Feature.ZOMBIE_TOOLS.getDouble("drop-chance-percent") / 100.0) return;
+        if (!(event.getEntity() instanceof Zombie zombie))
+            return;
+        if (!Feature.ZOMBIE_TOOLS.isEnabled(zombie))
+            return;
+        if (RANDOM.nextDouble() > Feature.ZOMBIE_TOOLS.getDouble("drop-chance-percent") / 100.0)
+            return;
 
         zombie.getEquipment();
         ItemStack mainHand = zombie.getEquipment().getItemInMainHand();
-        if (!isTool(mainHand.getType())) return;
+        if (!isTool(mainHand.getType()))
+            return;
 
         ItemStack dropItem = mainHand.clone();
         ItemMeta meta = dropItem.getItemMeta();
@@ -103,10 +111,14 @@ public class ZombieToolsFeature extends AbstractFeature {
         double total = netherite + diamond + gold + iron + wood;
         double roll = RANDOM.nextDouble() * total;
 
-        if (roll <= netherite) return ToolTier.NETHERITE;
-        if (roll <= netherite + diamond) return ToolTier.DIAMOND;
-        if (roll <= netherite + diamond + gold) return ToolTier.GOLDEN;
-        if (roll <= netherite + diamond + gold + iron) return ToolTier.IRON;
+        if (roll <= netherite)
+            return ToolTier.NETHERITE;
+        if (roll <= netherite + diamond)
+            return ToolTier.DIAMOND;
+        if (roll <= netherite + diamond + gold)
+            return ToolTier.GOLDEN;
+        if (roll <= netherite + diamond + gold + iron)
+            return ToolTier.IRON;
         return ToolTier.WOODEN;
     }
 
@@ -115,8 +127,7 @@ public class ZombieToolsFeature extends AbstractFeature {
         List<Enchantment> possible = new ArrayList<>(List.of(
                 Enchantment.EFFICIENCY,
                 Enchantment.UNBREAKING,
-                Enchantment.FORTUNE
-        ));
+                Enchantment.FORTUNE));
         if (item.getType().name().contains("_AXE")) {
             possible.add(Enchantment.SHARPNESS);
             possible.add(Enchantment.SMITE);
@@ -126,7 +137,8 @@ public class ZombieToolsFeature extends AbstractFeature {
             int level = RANDOM.nextInt(enchant.getMaxLevel()) + enchant.getStartLevel();
             try {
                 item.addUnsafeEnchantment(enchant, level);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 

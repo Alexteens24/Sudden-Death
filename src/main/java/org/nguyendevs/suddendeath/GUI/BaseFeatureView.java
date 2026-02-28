@@ -296,8 +296,10 @@ public abstract class BaseFeatureView extends PluginInventory {
                 default -> null;
             };
 
+            @SuppressWarnings("unchecked")
+            EnumSet<Feature> typedFilter = filterSet != null ? (EnumSet<Feature>) filterSet : null;
             for (Feature f : all) {
-                if (filterSet == null || ((EnumSet<?>) filterSet).contains(f)) {
+                if (typedFilter == null || typedFilter.contains(f)) {
                     list.add(f);
                 }
             }
